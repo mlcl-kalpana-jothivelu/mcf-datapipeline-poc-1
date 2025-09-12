@@ -108,7 +108,7 @@ data "archive_file" "lambda_zip" {
   type        = "zip"
   output_path = "lambda_function.zip"
   source {
-    content = file("${path.module}/fileparser.py")
+    content = file("${path.module}/index.py")
     filename = "index.py"
   }
 }

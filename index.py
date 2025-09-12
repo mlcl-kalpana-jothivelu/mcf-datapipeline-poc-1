@@ -391,7 +391,7 @@ def determine_parquet_column_types(schema):
     
     return column_types
 
-def sanitize_table_name(filename):
+# def sanitize_table_name(filename):
     """
     Sanitize filename to create valid PostgreSQL table name
     """
