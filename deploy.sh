@@ -1,18 +1,19 @@
 #!/bin/bash
+
 echo "Creating Lambda deployment package..."
 
 # Clean up previous builds
-rm -rf package/
+rm -rf package
 rm -f lambda_function.zip
 
 # Create package directory
 mkdir -p package
 
 # Install dependencies for Lambda
-pip3 install -r requirements.txt -t ./package/
+pip3 install -r requirements.txt -t package
 
 # Copy Lambda function
-cp index.py package/
+cp index.py package
 
 # Create deployment package
 cd package

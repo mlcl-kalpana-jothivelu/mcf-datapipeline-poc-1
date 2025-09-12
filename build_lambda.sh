@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Define variables
-PACKAGE_DIR="package"
-ZIP_FILE="lambda_function.zip"
+PACKAGE_DIR="lambda_package"
+ZIP_FILE="lambda_function2.zip"
 LAMBDA_FILE="index.py"
 
 # Clean up previous builds
@@ -12,7 +12,7 @@ rm -rf $PACKAGE_DIR $ZIP_FILE
 mkdir $PACKAGE_DIR
 
 # Install dependencies into the package directory
-pip install -r requirements.txt -t $PACKAGE_DIR
+pip3 install -r requirements.txt -t $PACKAGE_DIR
 
 # Copy your lambda function into the package
 cp $LAMBDA_FILE $PACKAGE_DIR/

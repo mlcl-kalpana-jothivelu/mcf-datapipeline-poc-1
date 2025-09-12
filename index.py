@@ -32,11 +32,15 @@ def handler(event, context):
             print(f"Processing EventBridge event for: s3://{bucket}/{key}")
             
             # Download file from S3
-            response = s3_client.get_object(Bucket=bucket, Key=key)
-            file_content = response['Body'].read()
+            # response = s3_client.get_object(Bucket=bucket, Key=key)
+            # file_content = response['Body'].read()
+
+            # print(f"Downloaded S3 file for: s3://{bucket}/{key}")
             
             # Store file metadata in PostgreSQL
-            store_file_metadata(db_host, db_name, db_user, db_password, bucket, key, len(file_content))
+            #store_file_metadata(db_host, db_name, db_user, db_password, bucket, key, len(file_content))
+
+            process_file_content(db_host, db_name, db_user, db_password, bucket, key, file_content)
             
         else:
             # Handle S3 direct event format (if needed)
@@ -50,7 +54,7 @@ def handler(event, context):
                     response = s3_client.get_object(Bucket=bucket, Key=key)
                     file_content = response['Body'].read()
                     
-                    store_file_metadata(db_host, db_name, db_user, db_password, bucket, key, len(file_content))
+                    #store_file_metadata(db_host, db_name, db_user, db_password, bucket, key, len(file_content))
                     process_file_content(db_host, db_name, db_user, db_password, bucket, key, file_content)
     except Exception as e:
         print(f"Error processing event: {str(e)}")
@@ -119,6 +123,9 @@ def process_file_content(db_host, db_name, db_user, db_password, bucket, key, fi
     """
     Process file content and insert records into PostgreSQL
     """
+
+    print(f"Starting processing")
+
     try:
         # Determine file type based on extension
         file_extension = key.lower().split('.')[-1]
@@ -138,6 +145,9 @@ def process_csv_file(db_host, db_name, db_user, db_password, bucket, key, file_c
     """
     Process CSV file and insert records into structured table
     """
+
+    print(f"Starting processing CSV file")
+
     try:
         # Decode file content
         content_str = file_content.decode('utf-8')
@@ -229,6 +239,9 @@ def process_parquet_file(db_host, db_name, db_user, db_password, bucket, key, fi
     """
     Process Parquet file and insert records into structured table
     """
+
+    print(f"Starting processing parquest file")
+    
     try:
         # Read Parquet file from bytes
         parquet_file = io.BytesIO(file_content)
