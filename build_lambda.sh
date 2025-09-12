@@ -3,7 +3,7 @@
 # Define variables
 PACKAGE_DIR="lambda_package"
 ZIP_FILE="lambda_deploy.zip"
-LAMBDA_FILE="fileparser.py"
+LAMBDA_FILE="index.py"
 
 # Clean up previous builds
 rm -rf $PACKAGE_DIR $ZIP_FILE
