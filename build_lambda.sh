@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Define variables
-PACKAGE_DIR="lambda_package"
-ZIP_FILE="lambda_deploy.zip"
+PACKAGE_DIR="package"
+ZIP_FILE="lambda_function.zip"
 LAMBDA_FILE="index.py"
 
 # Clean up previous builds
