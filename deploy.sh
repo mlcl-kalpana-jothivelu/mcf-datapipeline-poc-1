@@ -13,7 +13,7 @@ mkdir -p package
 pip3 install -r requirements.txt -t package
 
 # Copy Lambda function
-cp index.py package
+cp index.py package/
 
 # Create deployment package
 cd package

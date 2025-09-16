@@ -87,31 +87,39 @@ resource "aws_iam_role_policy" "s3_eventbridge_policy" {
 
 # Lambda function
 resource "aws_lambda_function" "main" {
-  filename         = "lambda_function.zip"
   function_name    = "${var.project_name}-lambda-processor"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
+  #handler         = "lambda_function.lambda_handler"
   runtime         = "python3.12"
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  filename        = "${path.module}/lambda_function.zip"
+  source_code_hash = filebase64sha256("${path.module}/lambda_function.zip")
+
+  # filename         = data.archive_file.lambda_zip.output_path
+  # source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   environment {
     variables = {
       S3_BUCKET = aws_s3_bucket.main.bucket
       DB_HOST   = aws_db_instance.postgres.endpoint
       DB_NAME   = aws_db_instance.postgres.db_name
+      DB_USER   = aws_db_instance.postgres.username
     }
   }
 }
 
-# Lambda deployment package
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  output_path = "lambda_function.zip"
-  source {
-    content = file("${path.module}/index.py")
-    filename = "index.py"
-  }
-}
+# Lambda deployment package - DO NOT USE DATA ARCHIVE_FILE, THIS IS FOR W/O DEPENDENCIES
+# data "archive_file" "lambda_zip" {
+#   type        = "zip"
+#   source_dir  = "${path.module}/package"
+#   output_path = "${path.module}/lambda_function.zip"
+
+#   # output_path = "lambda_function.zip"
+#   # source {
+#   #   content = file("${path.module}/index.py")
+#   #   filename = "${path.module}/package/index.py"
+#   # }
+# }
 
 # IAM role for Lambda
 resource "aws_iam_role" "lambda_role" {

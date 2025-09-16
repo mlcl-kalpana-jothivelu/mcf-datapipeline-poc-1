@@ -32,10 +32,10 @@ def handler(event, context):
             print(f"Processing EventBridge event for: s3://{bucket}/{key}")
             
             # Download file from S3
-            # response = s3_client.get_object(Bucket=bucket, Key=key)
-            # file_content = response['Body'].read()
+            response = s3_client.get_object(Bucket=bucket, Key=key)
+            file_content = response['Body'].read()
 
-            # print(f"Downloaded S3 file for: s3://{bucket}/{key}")
+            print(f"Downloaded S3 file for: s3://{bucket}/{key}")
             
             # Store file metadata in PostgreSQL
             #store_file_metadata(db_host, db_name, db_user, db_password, bucket, key, len(file_content))
@@ -124,7 +124,7 @@ def process_file_content(db_host, db_name, db_user, db_password, bucket, key, fi
     Process file content and insert records into PostgreSQL
     """
 
-    print(f"Starting processing")
+    print(f"Starting processing file content")
 
     try:
         # Determine file type based on extension
