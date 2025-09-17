@@ -11,8 +11,9 @@ terraform.tfplan.json
 *.tfplan.json
 
 # Lambda deployment packages
+lambda_deploy.zip
 lambda_function.zip
-package/
+lambda_package/
 *.zip
 
 # Python files

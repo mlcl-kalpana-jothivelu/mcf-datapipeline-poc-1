@@ -1,14 +1,17 @@
 #!/bin/bash
+
 echo "Creating Lambda deployment package..."
 
 # Clean up previous builds
-rm -rf package/
+rm -rf package
 rm -f lambda_function.zip
 
 # Create package directory
 mkdir -p package
 
-pip3 install -r requirements.txt -t package/ --platform linux_x86_64 --implementation cp --python-version 3.9 --only-binary=:all: --upgrade
+# Install dependencies for Lambda
+pip3 install -r requirements.txt -t package
+# pip3 install -r requirements.txt -t package/ --platform linux_x86_64 --implementation cp --python-version 3.9 --only-binary=:all: --upgrade
 
 # Copy Lambda function (renamed to index.py)
 cp index.py package/
@@ -28,21 +31,6 @@ echo "Package size: $(du -h lambda_function.zip | cut -f1)"
 # List package contents to verify
 echo "Package contents:"
 unzip -l lambda_function.zip | head -20
-
-
-# # Install dependencies for Lambda
-# pip install -r requirements.txt -t ./package/
-
-# # Copy Lambda function
-# cp index.py package/
-
-# # Create deployment package
-# cd package
-# zip -r ../lambda_function.zip .
-# cd ..
-
-# echo "Lambda deployment package created: lambda_function.zip"
-
 
 
 # echo "Enabling EventBridge for S3 at account level..."
