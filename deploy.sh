@@ -11,9 +11,14 @@ mkdir -p package
 
 # Install dependencies for Lambda
 pip3 install -r requirements.txt -t package
+# pip3 install -r requirements.txt -t package/ --platform linux_x86_64 --implementation cp --python-version 3.9 --only-binary=:all: --upgrade
 
-# Copy Lambda function
+# Copy Lambda function (renamed to index.py)
 cp index.py package/
+
+# Verify psycopg2 is installed
+echo "Verifying psycopg2 installation..."
+ls -la package/ | grep psycopg2 || echo "WARNING: psycopg2 not found in package"
 
 # Create deployment package
 cd package
@@ -21,55 +26,29 @@ zip -r ../lambda_function.zip .
 cd ..
 
 echo "Lambda deployment package created: lambda_function.zip"
+echo "Package size: $(du -h lambda_function.zip | cut -f1)"
 
-echo "Enabling EventBridge for S3 at account level..."
+# List package contents to verify
+echo "Package contents:"
+unzip -l lambda_function.zip | head -20
 
-# Enable EventBridge for S3
-aws s3api put-bucket-notification-configuration \
-    --bucket $(terraform output -raw s3_bucket_name) \
-    --notification-configuration '{"EventBridgeConfiguration": {}}'
 
-echo "EventBridge enabled for S3 bucket"
+# echo "Enabling EventBridge for S3 at account level..."
 
-# Verify the configuration
-echo "Verifying bucket notification configuration:"
-aws s3api get-bucket-notification-configuration --bucket $(terraform output -raw s3_bucket_name)
+# # Enable EventBridge for S3
+# aws s3api put-bucket-notification-configuration \
+#     --bucket $(terraform output -raw s3_bucket_name) \
+#     --notification-configuration '{"EventBridgeConfiguration": {}}'
+
+# echo "EventBridge enabled for S3 bucket"
+
+# # Verify the configuration
+# echo "Verifying bucket notification configuration:"
+# aws s3api get-bucket-notification-configuration --bucket $(terraform output -raw s3_bucket_name)
 
 # Add the Lambda function code
-# zip -g lambda_function.zip fileparser.py
+# zip -g lambda_function.zip index.py
 
-#!/bin/bash
-
-echo "Testing S3 to EventBridge integration..."
-
-BUCKET_NAME=$(terraform output -raw s3_bucket_name)
-echo "S3 Bucket: $BUCKET_NAME"
-
-# Create a test file
-echo "id,name,email" > test_eventbridge.csv
-echo "1,Test User,test@email.com" >> test_eventbridge.csv
-
-# Upload file to S3
-echo "Uploading test file to S3..."
-aws s3 cp test_eventbridge.csv s3://$BUCKET_NAME/test_eventbridge.csv
-
-echo "File uploaded. Now checking EventBridge..."
-
-# Wait a moment for the event to be processed
-sleep 5
-
-# Check EventBridge rules
-echo "EventBridge Rules:"
-aws events list-rules --name-prefix mcf-data-pipeline-s3-events
-
-# Check recent events in EventBridge
-echo "Recent EventBridge events:"
-aws logs describe-log-groups --log-group-name-prefix "/aws/events/rule"
-
-# Clean up
-rm test_eventbridge.csv
-
-echo "Test complete. Check CloudWatch logs for EventBridge events."
 
 
 # Initialize and apply Terraform
