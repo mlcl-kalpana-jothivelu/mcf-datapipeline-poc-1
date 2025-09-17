@@ -2,7 +2,10 @@ import json
 import boto3
 import psycopg2
 import os
+import csv
+import io
 from urllib.parse import unquote_plus
+import re
 
 def handler(event, context):
     """
@@ -157,11 +160,17 @@ def process_csv_file(db_host, db_name, db_user, db_password, bucket, key, file_c
         columns = csv_reader.fieldnames
         sample_rows = []
         
+        #print(f"CSV Columns: {columns.join(', ')}")
+        
         # Read first few rows to determine column types
         for i, row in enumerate(csv_reader):
             sample_rows.append(row)
             if i >= 5:  # Sample first 5 rows
                 break
+        
+        print(f"Read {sample_rows.count()} rows")
+        
+        print(f"Start connecting to database")
         
         conn = psycopg2.connect(
             host=db_host,
@@ -172,6 +181,8 @@ def process_csv_file(db_host, db_name, db_user, db_password, bucket, key, file_c
         )
         
         cursor = conn.cursor()
+        
+        print(f"Start creating db table if not exist")
         
         # Create table name from file name
         table_name = "MEMBER"
