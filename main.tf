@@ -99,6 +99,7 @@ resource "aws_lambda_function" "main" {
       S3_BUCKET = aws_s3_bucket.main.bucket
       DB_HOST   = aws_db_instance.postgres.endpoint
       DB_NAME   = aws_db_instance.postgres.db_name
+      DB_USER   = aws_db_instance.postgres.username
     }
   }
 }

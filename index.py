@@ -36,8 +36,8 @@ def handler(event, context):
             file_content = response['Body'].read()
             
             # Store file metadata in PostgreSQL
-            store_file_metadata(db_host, db_name, db_user, db_password, bucket, key, len(file_content))
-            
+            # store_file_metadata(db_host, db_name, db_user, db_password, bucket, key, len(file_content))
+            process_file_content(db_host, db_name, db_user, db_password, bucket, key, file_content)
         else:
             # Handle S3 direct event format (if needed)
             for record in event.get('Records', []):
@@ -50,7 +50,7 @@ def handler(event, context):
                     response = s3_client.get_object(Bucket=bucket, Key=key)
                     file_content = response['Body'].read()
                     
-                    store_file_metadata(db_host, db_name, db_user, db_password, bucket, key, len(file_content))
+                    # store_file_metadata(db_host, db_name, db_user, db_password, bucket, key, len(file_content))
                     process_file_content(db_host, db_name, db_user, db_password, bucket, key, file_content)
     except Exception as e:
         print(f"Error processing event: {str(e)}")
@@ -391,20 +391,20 @@ def determine_parquet_column_types(schema):
     
     return column_types
 
-# def sanitize_table_name(filename):
-    """
-    Sanitize filename to create valid PostgreSQL table name
-    """
-    # Remove file extension
-    name = filename.split('.')[0]
+# # def sanitize_table_name(filename):
+#     """
+#     Sanitize filename to create valid PostgreSQL table name
+#     """
+#     # Remove file extension
+#     name = filename.split('.')[0]
     
-    # Replace invalid characters with underscores
-    name = re.sub(r'[^a-zA-Z0-9_]', '_', name)
+#     # Replace invalid characters with underscores
+#     name = re.sub(r'[^a-zA-Z0-9_]', '_', name)
     
-    # Ensure it starts with a letter
-    if name[0].isdigit():
-        name = 'table_' + name
+#     # Ensure it starts with a letter
+#     if name[0].isdigit():
+#         name = 'table_' + name
     
-    # Limit length
-    return name[:50]
+#     # Limit length
+#     return name[:50]
 

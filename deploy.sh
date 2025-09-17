@@ -1,33 +1,28 @@
 #!/bin/bash
-echo "Creating Lambda deployment package..."
+
+# Define variables
+PACKAGE_DIR="lambda_package"
+ZIP_FILE="lambda_function2.zip"
+LAMBDA_FILE="index.py"
 
 # Clean up previous builds
-rm -rf package/
-rm -f lambda_function.zip
+rm -rf $PACKAGE_DIR $ZIP_FILE
 
 # Create package directory
-mkdir -p package
+mkdir $PACKAGE_DIR
 
-pip3 install -r requirements.txt -t package/ --platform linux_x86_64 --implementation cp --python-version 3.9 --only-binary=:all: --upgrade
+# Install dependencies into the package directory
+pip3 install -r requirements.txt -t $PACKAGE_DIR
 
-# Copy Lambda function (renamed to index.py)
-cp index.py package/
+# Copy your lambda function into the package
+cp $LAMBDA_FILE $PACKAGE_DIR/
 
-# Verify psycopg2 is installed
-echo "Verifying psycopg2 installation..."
-ls -la package/ | grep psycopg2 || echo "WARNING: psycopg2 not found in package"
-
-# Create deployment package
-cd package
-zip -r ../lambda_function.zip .
+# Zip the contents
+cd $PACKAGE_DIR
+zip -r ../$ZIP_FILE .
 cd ..
 
-echo "Lambda deployment package created: lambda_function.zip"
-echo "Package size: $(du -h lambda_function.zip | cut -f1)"
-
-# List package contents to verify
-echo "Package contents:"
-unzip -l lambda_function.zip | head -20
+echo "✅ Lambda deployment package created: $ZIP_FILE"
 
 
 # # Install dependencies for Lambda
