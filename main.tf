@@ -170,30 +170,45 @@ resource "aws_iam_role_policy" "lambda_s3_policy" {
   role = aws_iam_role.lambda_role.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          aws_s3_bucket.main.arn,
-          "${aws_s3_bucket.main.arn}/*"
-        ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = "arn:aws:logs:*:*:*"
-      }
-    ]
-  })
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Action": [
+				"s3:*"
+			],
+			"Effect": "Allow",
+			"Resource": [
+				"arn:aws:s3:::mcf-data-pipeline-bucket-fa5aed16",
+				"arn:aws:s3:::mcf-data-pipeline-bucket-fa5aed16/*"
+			]
+		},
+		{
+			"Action": [
+				"logs:CreateLogGroup",
+				"logs:CreateLogStream",
+				"logs:PutLogEvents",
+				"ec2:CreateNetworkInterface",
+				"ec2:*"
+			],
+			"Effect": "Allow",
+			"Resource": "arn:aws:logs:*:*:*"
+		},
+		{
+			"Action": [
+				"ec2:*"
+			],
+			"Effect": "Allow",
+			"Resource": "arn:aws:ec2:ap-southeast-2:145400477145:vpc/vpc-0b0561352d4a49872"
+		},
+		{
+			"Action": [
+				"ec2:*"
+			],
+			"Effect": "Allow",
+			"Resource": "*"
+		}
+	]
+})
 }
 
 # RDS Subnet Group

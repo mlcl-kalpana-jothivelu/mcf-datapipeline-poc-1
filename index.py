@@ -422,13 +422,13 @@ def sanitize_table_name(filename):
     # Remove file extension
     name = filename.split('.')[0]
     
-    # Replace invalid characters with underscores
-    name = re.sub(r'[^a-zA-Z0-9_]', '_', name)
+#     # Replace invalid characters with underscores
+#     name = re.sub(r'[^a-zA-Z0-9_]', '_', name)
     
-    # Ensure it starts with a letter
-    if name[0].isdigit():
-        name = 'table_' + name
+#     # Ensure it starts with a letter
+#     if name[0].isdigit():
+#         name = 'table_' + name
     
-    # Limit length
-    return name[:50]
+#     # Limit length
+#     return name[:50]
 
