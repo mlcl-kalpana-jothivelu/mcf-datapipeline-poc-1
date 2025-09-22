@@ -2,7 +2,7 @@
 
 # Define variables
 PACKAGE_DIR="lambda_package"
-ZIP_FILE="lambda_function2.zip"
+ZIP_FILE="lambda_function.zip"
 LAMBDA_FILE="index.py"
 
 # Clean up previous builds

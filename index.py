@@ -1,11 +1,14 @@
 import json
 import boto3
+#import botocore
 import psycopg2
 import os
 import csv
 import io
 from urllib.parse import unquote_plus
 import re
+#import pyarrow.parquet as pq
+#import pandas as pd
 
 def handler(event, context):
     """
@@ -14,8 +17,12 @@ def handler(event, context):
     print(f"Received event: {json.dumps(event)}")
     
     # Initialize S3 client
-    s3_client = boto3.client('s3')
+    #s3 = boto3.client('s3')
     
+    s3_client = boto3.client('s3')
+    #s3_client = boto3.client('s3', 'ap-southeast-2', config=botocore.config.Config(s3={'addressing_style':'auto'}))
+    #s3_client = boto3.client('s3', 'ap-southeast-2', endpoint_url='https://mcf-data-pipeline-bucket-fa5aed16.s3.ap-southeast-2.amazonaws.com')
+    #print(f"Buckets: {s3_client.list_buckets()}")
     # Get environment variables
     bucket_name = os.environ['S3_BUCKET']
     db_host = os.environ['DB_HOST']
@@ -33,7 +40,7 @@ def handler(event, context):
             file_size = event['detail']['object'].get('size', 0)
             
             print(f"Processing EventBridge event for: s3://{bucket}/{key}")
-            
+            #print(boto3.client('s3').list_buckets())
             # Download file from S3
             response = s3_client.get_object(Bucket=bucket, Key=key)
             file_content = response['Body'].read()
@@ -60,7 +67,7 @@ def handler(event, context):
                     #store_file_metadata(db_host, db_name, db_user, db_password, bucket, key, len(file_content))
                     process_file_content(db_host, db_name, db_user, db_password, bucket, key, file_content)
     except Exception as e:
-        print(f"Error processing event: {str(e)}")
+        print(f"Error processing event: {e}")
         raise e
     
     return {
@@ -135,8 +142,8 @@ def process_file_content(db_host, db_name, db_user, db_password, bucket, key, fi
         
         if file_extension == 'csv':
             process_csv_file(db_host, db_name, db_user, db_password, bucket, key, file_content)
-        elif file_extension == 'parquet':
-            process_parquet_file(db_host, db_name, db_user, db_password, bucket, key, file_content)
+        #elif file_extension == 'parquet':
+        #    process_parquet_file(db_host, db_name, db_user, db_password, bucket, key, file_content)
         else:
             print(f"Unsupported file type: {file_extension}")
             
@@ -164,11 +171,12 @@ def process_csv_file(db_host, db_name, db_user, db_password, bucket, key, file_c
         
         # Read first few rows to determine column types
         for i, row in enumerate(csv_reader):
+            print(f"Row {i}: {row}")
             sample_rows.append(row)
             if i >= 5:  # Sample first 5 rows
                 break
         
-        print(f"Read {sample_rows.count()} rows")
+        print(f"Read X rows from csv file")
         
         print(f"Start connecting to database")
         
@@ -246,101 +254,101 @@ def process_csv_file(db_host, db_name, db_user, db_password, bucket, key, file_c
     except Exception as e:
         print(f"Error processing CSV file: {str(e)}")
         raise e
-def process_parquet_file(db_host, db_name, db_user, db_password, bucket, key, file_content):
-    """
-    Process Parquet file and insert records into structured table
-    """
+# def process_parquet_file(db_host, db_name, db_user, db_password, bucket, key, file_content):
+#     """
+#     Process Parquet file and insert records into structured table
+#     """
 
-    print(f"Starting processing parquest file")
+#     print(f"Starting processing parquest file")
     
-    try:
-        # Read Parquet file from bytes
-        parquet_file = io.BytesIO(file_content)
-        table = pq.read_table(parquet_file)
+#     try:
+#         # Read Parquet file from bytes
+#         parquet_file = io.BytesIO(file_content)
+#         table = pq.read_table(parquet_file)
         
-        # Convert to pandas-like structure for easier processing
-        df = table.to_pandas()
+#         # Convert to pandas-like structure for easier processing
+#         df = table.to_pandas()
         
-        # Get column names
-        columns = list(df.columns)
+#         # Get column names
+#         columns = list(df.columns)
         
-        conn = psycopg2.connect(
-            host=db_host,
-            database=db_name,
-            user=db_user,
-            password=db_password,
-            port=5432
-        )
+#         conn = psycopg2.connect(
+#             host=db_host,
+#             database=db_name,
+#             user=db_user,
+#             password=db_password,
+#             port=5432
+#         )
         
-        cursor = conn.cursor()
+#         cursor = conn.cursor()
         
-        # Create table name from file name
-        table_name = "MEMBER"
-        # f"data_{sanitize_table_name(key)}"
+#         # Create table name from file name
+#         table_name = "MEMBER"
+#         # f"data_{sanitize_table_name(key)}"
         
-        # Determine column types from Parquet schema
-        column_definitions = determine_parquet_column_types(table.schema)
+#         # Determine column types from Parquet schema
+#         column_definitions = determine_parquet_column_types(table.schema)
         
-        # Create table
-        create_table_sql = f"""
-            CREATE TABLE IF NOT EXISTS {table_name} (
-                id VARCHAR PRIMARY KEY,
-                # first_name VARCHAR(255),
-                # surname VARCHAR(500),
-                # date_of_birth DATE,
-                # gender VARCHAR(50),       
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-            # CREATE TABLE IF NOT EXISTS {table_name} (
-            #     id SERIAL PRIMARY KEY,
-            #     source_file VARCHAR(500),
-            #     {', '.join([f'"{col}" {col_type}' for col, col_type in column_definitions.items()])},
-            #     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        #     )
-        # """
+#         # Create table
+#         create_table_sql = f"""
+#             CREATE TABLE IF NOT EXISTS {table_name} (
+#                 id VARCHAR PRIMARY KEY,
+#                 # first_name VARCHAR(255),
+#                 # surname VARCHAR(500),
+#                 # date_of_birth DATE,
+#                 # gender VARCHAR(50),       
+#                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+#             )
+#             # CREATE TABLE IF NOT EXISTS {table_name} (
+#             #     id SERIAL PRIMARY KEY,
+#             #     source_file VARCHAR(500),
+#             #     {', '.join([f'"{col}" {col_type}' for col, col_type in column_definitions.items()])},
+#             #     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+#         #     )
+#         # """
         
-        cursor.execute(create_table_sql)
-        print(f"Created/verified table: {table_name}")
+#         cursor.execute(create_table_sql)
+#         print(f"Created/verified table: {table_name}")
         
-        # Insert records
-        records_inserted = 0
+#         # Insert records
+#         records_inserted = 0
         
-        for index, row in df.iterrows():
-            # Prepare values for insertion
-            values = [key]  # source_file
-            placeholders = ['%s']  # source_file placeholder
+#         for index, row in df.iterrows():
+#             # Prepare values for insertion
+#             values = [key]  # source_file
+#             placeholders = ['%s']  # source_file placeholder
             
-            for col in columns:
-                value = row[col]
-                # Convert pandas NaN to None for proper NULL handling
-                if pd.isna(value):
-                    value = None
-                values.append(value)
-                placeholders.append('%s')
+#             for col in columns:
+#                 value = row[col]
+#                 # Convert pandas NaN to None for proper NULL handling
+#                 if pd.isna(value):
+#                     value = None
+#                 values.append(value)
+#                 placeholders.append('%s')
             
-            # Insert record
-            insert_sql = f"""
-                INSERT INTO {table_name} (source_file, {', '.join([f'"{col}"' for col in columns])})
-                VALUES ({', '.join(placeholders)})
-            """
+#             # Insert record
+#             insert_sql = f"""
+#                 INSERT INTO {table_name} (source_file, {', '.join([f'"{col}"' for col in columns])})
+#                 VALUES ({', '.join(placeholders)})
+#             """
             
-            cursor.execute(insert_sql, values)
-            records_inserted += 1
+#             cursor.execute(insert_sql, values)
+#             records_inserted += 1
             
-            # Limit to first 100 records for demo purposes
-            if records_inserted >= 100:
-                print(f"Inserted first 100 records from {key}")
-                break
+#             # Limit to first 100 records for demo purposes
+#             if records_inserted >= 100:
+#                 print(f"Inserted first 100 records from {key}")
+#                 break
         
-        conn.commit()
-        cursor.close()
-        conn.close()
+#         conn.commit()
+#         cursor.close()
+#         conn.close()
         
-        print(f"Inserted {records_inserted} records from Parquet file: {key} into table: {table_name}")
+#         print(f"Inserted {records_inserted} records from Parquet file: {key} into table: {table_name}")
         
-    except Exception as e:
-        print(f"Error processing Parquet file: {str(e)}")
-        raise e
+#     except Exception as e:
+#         print(f"Error processing Parquet file: {str(e)}")
+#         raise e
 
 def determine_column_types(columns, sample_data):
     """
@@ -386,49 +394,49 @@ def determine_column_types(columns, sample_data):
     
     return column_types
 
-def determine_parquet_column_types(schema):
-    """
-    Determine PostgreSQL column types from Parquet schema
-    """
-    column_types = {}
+# def determine_parquet_column_types(schema):
+#     """
+#     Determine PostgreSQL column types from Parquet schema
+#     """
+#     column_types = {}
     
-    for field in schema:
-        col_name = field.name
-        col_type = field.type
+#     for field in schema:
+#         col_name = field.name
+#         col_type = field.type
         
-        # Map Parquet types to PostgreSQL types
-        if pa.types.is_integer(col_type):
-            column_types[col_name] = 'INTEGER'
-        elif pa.types.is_floating(col_type):
-            column_types[col_name] = 'DECIMAL(10,2)'
-        elif pa.types.is_boolean(col_type):
-            column_types[col_name] = 'BOOLEAN'
-        elif pa.types.is_date(col_type):
-            column_types[col_name] = 'DATE'
-        elif pa.types.is_timestamp(col_type):
-            column_types[col_name] = 'TIMESTAMP'
-        elif pa.types.is_string(col_type) or pa.types.is_large_string(col_type):
-            column_types[col_name] = 'VARCHAR(500)'
-        else:
-            # Default to VARCHAR for unknown types
-            column_types[col_name] = 'VARCHAR(500)'
+#         # Map Parquet types to PostgreSQL types
+#         if pa.types.is_integer(col_type):
+#             column_types[col_name] = 'INTEGER'
+#         elif pa.types.is_floating(col_type):
+#             column_types[col_name] = 'DECIMAL(10,2)'
+#         elif pa.types.is_boolean(col_type):
+#             column_types[col_name] = 'BOOLEAN'
+#         elif pa.types.is_date(col_type):
+#             column_types[col_name] = 'DATE'
+#         elif pa.types.is_timestamp(col_type):
+#             column_types[col_name] = 'TIMESTAMP'
+#         elif pa.types.is_string(col_type) or pa.types.is_large_string(col_type):
+#             column_types[col_name] = 'VARCHAR(500)'
+#         else:
+#             # Default to VARCHAR for unknown types
+#             column_types[col_name] = 'VARCHAR(500)'
     
-    return column_types
+#     return column_types
 
-def sanitize_table_name(filename):
-    """
-    Sanitize filename to create valid PostgreSQL table name
-    """
-    # Remove file extension
-    name = filename.split('.')[0]
+# def sanitize_table_name(filename):
+#     """
+#     Sanitize filename to create valid PostgreSQL table name
+#     """
+#     # Remove file extension
+#     name = filename.split('.')[0]
     
-    # Replace invalid characters with underscores
-    name = re.sub(r'[^a-zA-Z0-9_]', '_', name)
+#     # Replace invalid characters with underscores
+#     name = re.sub(r'[^a-zA-Z0-9_]', '_', name)
     
-    # Ensure it starts with a letter
-    if name[0].isdigit():
-        name = 'table_' + name
+#     # Ensure it starts with a letter
+#     if name[0].isdigit():
+#         name = 'table_' + name
     
-    # Limit length
-    return name[:50]
+#     # Limit length
+#     return name[:50]
 
