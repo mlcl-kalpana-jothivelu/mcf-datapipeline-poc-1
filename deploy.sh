@@ -2,7 +2,7 @@
 
 # Define variables
 PACKAGE_DIR="lambda_package"
-ZIP_FILE="lambda_function2.zip"
+ZIP_FILE="lambda_function.zip"
 LAMBDA_FILE="index.py"
 
 # Clean up previous builds
@@ -56,10 +56,18 @@ echo "✅ Lambda deployment package created: $ZIP_FILE"
 # Add the Lambda function code
 # zip -g lambda_function.zip index.py
 
+AWS_REGION="ap-southeast-2"
+TFSTATE_BUCKET="tfstate-145400477145"
+REPO="mcf-datapipeline-poc"
 
 
 # Initialize and apply Terraform
-terraform init
+terraform init -reconfigure \
+ "-backend-config=region=${AWS_REGION}" \
+ "-backend-config=bucket=${TFSTATE_BUCKET}" \
+ "-backend-config=key=${REPO}/terraform.tfstate"
+ 
+#terraform init 
 terraform plan
 terraform apply -auto-approve
 
