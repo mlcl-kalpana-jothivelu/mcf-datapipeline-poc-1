@@ -3,3 +3,4 @@ psycopg2-binary>=2.9.0,<3.0.0
 #pyarrow>=10.0.1,<11.0.0
 #pyarrow==14.0.0
 pandas==2.2.3
+fastparquet==2024.11.0
