@@ -174,6 +174,7 @@ def process_data_frame(db_host, db_port, db_name, db_user, db_password, bucket, 
                 for _, row in valid_rows.iterrows():
                     # Example assumes member_id is unique
 
+                    print(f"Upserting member_id: {row['member_id']} with {row.to_dict()}")
                     cursor.execute("""
 
                         INSERT INTO member (member_id, name, email, date_of_birth)
