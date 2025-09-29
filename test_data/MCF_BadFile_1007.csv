@@ -1,0 +1,7 @@
+﻿member_id,name,surname,date_of_birth,email,Gender,State of Residence,Postcode,New member created during quarter?,Exit Date,XYZ,Salary for Employment,Benefit Class - Death,Division - Death,Death Sum Insured Default,Benefit Class TPD,Division - TPD,TPD Sum Insured Default,Benefit Class - IP,Division - IP,IP Sum Insured Additional,Waiting Period days,Benefit Period,Salary for IP,Change detail
+12345678,Test,User,1954-08-25,realuser@mail.com,Female,VIC,3136,N,,Eastern Regional Library,52748.57,G1234,Personal,10200,G456,Personal,10200,,,0,,,0,email changed
+23456789,Alicemock,Smith,1980-08-02,asmith@gmail.com,Female,NSW,2000,Y,,ABC Corp,60000,G2345,Corporate,15000,G567,Corporate,15000,G890,Corporate,5000,30,5 years,60000,email changed
+34567777,BobbyTest,Johnson,1980-08-03,BobbyTest.Johnson@gmail.com,Male,VIC,3050,N,,XYZ Ltd,55000,G3456,Personal,12000,G678,Personal,12000,G901,Personal,0,60,To age 65,0,new record
+,Rory,LeeMock,1980-08-04,Carol.LeeMock@gmail.com,Female,QLD,4001,Y,,QLD Health,70000,G4567,Corporate,20000,G789,Corporate,20000,G012,Corporate,10000,90,2 years,70000,missing member_id
+44559012,David,BrownTest,1980-08-05,David.BrownTest-gmail.com,Male,SA,5000,N,,SA Uni,48000,G5678,Personal,10000,G890,Personal,10000,G123,Personal,0,30,5 years,0,invalid email
+66770123,Emma,WilsonTest,1980-08-06,,Female,WA,6000,Y,,WA Mining,80000,G6789,Corporate,25000,G901,Corporate,25000,G234,Corporate,15000,30,To age 65,80000,missing email
