@@ -113,7 +113,8 @@ resource "aws_lambda_function" "main" {
   handler         = "index.handler"
   runtime         = "python3.12"
   filename        = "${path.module}/lambda_function.zip"
-  source_code_hash = filebase64sha256("${path.module}/lambda_function.zip")
+  #source_code_hash = filebase64sha256("${path.module}/lambda_function.zip")
+  timeout = 30
 
   vpc_config {
     subnet_ids = ["subnet-04123e95096d427db", "subnet-070a3cbcfc9f1e863"]
@@ -126,9 +127,10 @@ resource "aws_lambda_function" "main" {
   environment {
     variables = {
       S3_BUCKET = aws_s3_bucket.main.bucket
-      DB_HOST   = aws_db_instance.postgres.endpoint
+      DB_HOST   = split(":", aws_db_instance.postgres.endpoint)[0]
       DB_NAME   = aws_db_instance.postgres.db_name
       DB_USER   = aws_db_instance.postgres.username
+      DB_PORT   = split(":", aws_db_instance.postgres.endpoint)[1]
     }
   }
 }

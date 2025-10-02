@@ -3,6 +3,9 @@ MCF Datapipeline POC
 
 This pipeline automates the ingestion, processing, and storage of files (e.g., CSV, parquet) using scalable AWS services. It is designed to handle real-time file uploads, apply transformations, and store results for downstream database. The failed data are captured in a seperate file to send back to the source.
 
+**Infra steps**
+run deploy.sh
+
 **File Upload**
 
 User or system uploads a file to an S3 bucket.
