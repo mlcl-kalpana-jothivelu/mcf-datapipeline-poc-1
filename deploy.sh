@@ -60,7 +60,6 @@ AWS_REGION="ap-southeast-2"
 TFSTATE_BUCKET="tfstate-145400477145"
 REPO="mcf-datapipeline-poc"
 
-
 # Initialize and apply Terraform
 terraform init -reconfigure \
  "-backend-config=region=${AWS_REGION}" \
